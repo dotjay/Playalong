@@ -1,0 +1,329 @@
+/*
+Project:    Playalong
+Variant:    Screen
+
+Base grid: 10px
+
+Palette:
+
+text dark           #333
+text light          #eee
+
+main background     #336
+    tint 75%        #66668c
+    tint 50%        #9999b2
+
+----------------------------------------*/
+
+@import url("reset-html5.css");
+
+/**
+ * Base styles
+ */
+
+body{
+font-size: 0.625em;
+line-height: 1.5;
+font-family: Verdana, sans-serif;
+
+background: #fff;
+color: #333;
+}
+html>body{
+font-size: 10px;
+}
+
+a:link,
+a:visited{
+color: #333;
+border-bottom: 1px solid #333;
+text-decoration: none;
+}
+a:focus,
+a:hover,
+a:active{
+border-bottom: 1px solid #00f;
+color: #00f;
+}
+
+input{
+font-family: Verdana, sans-serif;
+}
+
+/**
+ * Main interface
+ */
+
+h1{
+height: 30px;
+padding: 0 10px;
+
+font: 2em/1.5 Baskerville, 'Palatino Linotype', serif;
+font-style: italic;
+font-weight: bold;
+
+background: #000;
+color: #eee;
+}
+
+#source-form{
+position: absolute;
+top: 0;
+right: 0;
+width: 100%;
+z-index: 90;
+}
+#source-form textarea{
+float: right;
+width: 308px;
+/*height: 34em;*/
+height: 100%;
+padding: 5px;
+}
+#source-form input{
+clear: both;
+float: right;
+width: 4.5em;
+height: 1.5625em;
+margin: 2px;
+padding: 0;
+
+font: 1.6em Copperplate, 'Copperplate Light', 'Copperplate Gothic Light', sans-serif;
+
+background: #eee;
+border: 0;
+-moz-border-radius: 20px;
+-webkit-border-radius: 20px;
+border-radius: 20px;
+color: #333;
+}
+
+#infobar{
+width: 100%;
+overflow: hidden;
+
+font-size: 1.375em;
+line-height: 1.5;
+
+background: #66668c;
+color: #eee;
+}
+#infobar dt{
+position: absolute;
+left: -9999px;
+}
+#infobar dd{
+position: relative;
+float: left;
+margin-right: 1em;
+padding: 0 10px;
+}
+#infobar span{
+z-index: 10;
+}
+#infobar form{
+display: none;
+position: absolute;
+top: 0px;
+left: 0;
+width: 15em;
+z-index: 50;
+}
+#tempo-new,
+#meter-new{
+float: left;
+width: 4.25em;
+height: 1.4285em;
+margin: 0 0 0 7px;
+padding: 0 2px;
+
+font-size: 14px;
+
+background: #336;
+border: 0;
+color: #eee;
+}
+#infobar input.button{
+float: left;
+height: 1.4285em;
+margin: 0;
+padding: 0 0.5em;
+
+font: 14px Copperplate, 'Copperplate Light', 'Copperplate Gothic Light', sans-serif;
+
+background: #eee;
+border: 0;
+color: #333;
+}
+
+#metronome{
+float: left;
+margin: 5px 10px;
+}
+#metronome div{
+float: left;
+width: 10px;
+height: 10px;
+margin-right: 5px;
+
+background: #363;
+border: 0;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+border-radius: 5px;
+}
+#metronome div.on{
+background: #668c66;
+}
+#metronome div.main{
+background: #633;
+}
+#metronome div.main-on{
+background: #8c6666;
+}
+
+#main{
+position: absolute;
+top: 50px;
+right: 0;
+bottom: 0;
+left: 0;
+
+background: #336;
+}
+
+#song-info{
+color: #eee;
+}
+#song-info h2{
+padding: 0 10px;
+
+font-size: 1.25em;
+font-weight: normal;
+
+cursor: pointer;
+}
+#song-info h2 a{
+border: 0;
+}
+#song-info h2 b{
+font-weight: normal;
+}
+#song-info h2 b:after{
+content: "]";
+}
+#song-info h2 b:before{
+content: "[";
+}
+#song-info h2 a span{
+position: absolute;
+left: -999px;
+}
+#song-info dl{
+padding: 0 10px;
+}
+#song-info dt{
+float: left;
+width: 6em;
+
+font-size: 1em;
+}
+#song-info dd,
+#song-info dd a{
+font-size: 1em;
+}
+#song-info dd ul{
+list-style: none;
+margin-left: 6em;
+}
+#song-info a:link,
+#song-info a:visited{
+border-color: #eee;
+color: #eee;
+}
+#song-info a:focus,
+#song-info a:hover,
+#song-info a:active{
+border-color: #fff;
+color: #fff;
+}
+
+#song-line,
+#song-incoming{
+position: absolute;
+top: 50%;
+
+font: 42px Copperplate, 'Copperplate Light', 'Copperplate Gothic Light', sans-serif;
+text-align: center;
+
+color: #eee;
+text-shadow: #000 -2px 2px 2px;
+}
+#song-line.faded{
+opacity: 0.5;
+}
+#song-line{
+width: 100%;
+}
+#song-incoming{
+right: 0;
+opacity: 0.5;
+}
+#song-line b,
+#song-incoming b{
+position: relative;
+top: -0.75em;
+left: 0.5em;
+padding-top: 0.75em;
+
+font: 42px Georgia, Times, "Times New Roman", serif;
+}
+
+#controls{
+position: absolute;
+bottom: 5px;
+right: 5px;
+}
+#controls form{
+float: left;
+}
+#controls button,
+#tempo-pad{
+float: left;
+margin: 0 0 0 5px;
+padding: 0;
+
+background: none;
+border: 0;
+}
+#controls button b,
+#tempo-pad{
+display: block;
+min-width: 40px;
+height: 25px;
+line-height: 40px;
+padding: 5px 10px 0;
+
+font: 20px Copperplate, 'Copperplate Light', 'Copperplate Gothic Light', sans-serif;
+text-align: center;
+
+background: #66668c;
+border: 0;
+-moz-border-radius: 20px;
+-webkit-border-radius: 20px;
+border-radius: 20px;
+color: #333;
+}
+#controls button:active b,
+#tempo-pad:active{
+/*height: 30px;
+padding: 0 8px;
+
+font-size: 25px;*/
+
+background: #9999b2;
+}
+#play,
+#stop{
+display: none;
+}
