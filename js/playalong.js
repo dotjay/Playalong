@@ -29,16 +29,6 @@ Playalong.Env = {
  * Playalong.log
  * Logs for debugging.
  */
-//if (Playalong.Env.iPhone) {
-//	Playalong.log = function(m) {
-//		alert(m);
-//	};
-//}
-//else {
-//	Playalong.log = function(m) {
-//		console.log(m);
-//	};
-//}
 Playalong.log = function(m) {
 	console.log(m);
 };
@@ -164,6 +154,8 @@ Playalong.Core = (function() {
 			return false;
 		});
 
+		player.load(s);
+
 		// Show the play button now we have something to play!
 		$("#play").show();
 	}
@@ -223,6 +215,15 @@ Playalong.Event = (function() {
 	return {
 		bind: function(el, type, func) {
 			$(el).bind(type, func);
+		},
+		throttle: function(method, context, timeout) {
+			if (!timeout) {
+				timeout = 100;
+			}
+			clearTimeout(method.timerRef);
+			method.timerRef = setTimeout(function() {
+				method.call(context);
+			}, timeout);
 		},
 		unbind: function(el, type) {
 			$(el).unbind(type);
@@ -394,7 +395,7 @@ Playalong.ChordParser = function() {
 						inVerse = true;
 					}
 
-					l = l.replace(/\[/g, " <b>").replace(/\]/g, "</b>");
+					l = l.replace(/\[/g, "<b>").replace(/\]/g, "</b>");
 
 					songLines.push(l);
 				}
@@ -648,18 +649,16 @@ Playalong.Meter = function() {
  */
 Playalong.Player = function() {
 	var config = {
+			countIn: 1,
 			formId: "control-form",
-			incomingLineId: "song-incoming",
 			songLineId: "song-line"
 		},
+		currentLine,
 		form,
-		incomingLineDisplay,
-		inBridge = false,
-		inChorus = false,
-		inCountin = false,
-		inIntro = false,
-		inVerse = false,
+		lineOffset = 0,
+		loaded = false,
 		metronome,
+		metronomeFirst,
 		self = this,
 		song,
 		songLineDisplay,
@@ -667,14 +666,15 @@ Playalong.Player = function() {
 		timer;
 
 	function doBeat(beat) {
-		var i,
+		var e,
+			els,
+			i,
 			line,
-			lineReady = false,
 			m = metronome,
 			msPerMeasure,
+			n,
 			offset,
 			s,
-			tmp,
 			w;
 
 		timer = setTimeout(function() {
@@ -684,113 +684,58 @@ Playalong.Player = function() {
 		s = song;
 
 		if (beat === 1) {
-			line = s.getNextLine();
+			n = currentLine;
 
-			if (inCountin) {
-				songLineDisplay.className = '';
-				inCountin = false;
+			// Light the first beat only once, since it's always lit.
+			if (metronomeFirst) {
+				e = m.elements[beat - 1];
+				e.className = (e.className === 'main') ? 'main-on' : 'on';
+				metronomeFirst = false;
 			}
-
-			while (!lineReady) {
-				switch (line) {
-				case "<verse>":
-					inVerse = true;
-					line = s.getNextLine();
-					break;
-				case "</verse>":
-					inVerse = false;
-					line = s.getNextLine();
-					break;
-				case "<chorus>":
-					inChorus = true;
-					line = s.getNextLine();
-					break;
-				case "</chorus>":
-					inChorus = false;
-					line = s.getNextLine();
-					break;
-				case "<bridge>":
-					inBridge = true;
-					line = s.getNextLine();
-					break;
-				case "</bridge>":
-					inBridge = false;
-					line = s.getNextLine();
-					break;
-				case "<intro>":
-					inIntro = true;
-					line = s.getNextLine();
-					break;
-				case "</intro>":
-					inIntro = false;
-					line = s.getNextLine();
-					break;
-				case "<countin />":
-					inCountin = true;
-					songLineDisplay.className = "faded";
-
-					offset = 0;
-					do {
-						line = s.getIncomingLine(offset);
-						offset = offset + 1;
-					} while (line.substr(0, 1) === "<");
-
-					songLineDisplay.innerHTML = '<pre>' + line + '</pre>';
-					line = null;
-					break;
-				case "<song>":
-					line = s.getNextLine();
-					break;
-				case "</song>":
-					self.stop();
-					line = null;
-					break;
-				default:
-					lineReady = true;
-					break;
+			else {
+				// Clear classes from all beat indicators except the first
+				els = m.elements;
+				for (i = els.length - 1; i > 0; i--) {
+					e = els[i];
+					e.className = (e.className === 'main-on') ? 'main' : '';
 				}
 			}
 
-			if (line) {
-				msPerMeasure = m.msPerMeasure;
+			if (n > 0) {
+				if (n > 1) {
+					document.getElementById('line-' + (n - 1)).className = '';
+				}
 
-				$(songLineDisplay).stop();
-				songLineDisplay.innerHTML = '<pre>' + line + '</pre>';
-				songLineDisplay.style.marginLeft = '0px';
-				$(songLineDisplay).stop().animate({ 'margin-left': '-50px' }, msPerMeasure);
+				line = document.getElementById('line-' + n);
 
-				$(incomingLineDisplay).stop();
-				incomingLineDisplay.innerHTML = '<pre>' + s.getIncomingLine() + '</pre>';
-				w = 0 - incomingLineDisplay.offsetWidth;
-				incomingLineDisplay.style.right = w + 'px';
-				$(incomingLineDisplay).animate({
-					right: (w + 100) + 'px'
-				}, msPerMeasure);
+				if (line) {
+					currentLine = n + 1;
+					line.className = 'current';
 
-				if (started) {
-					// Clear classes from all beat indicators except the first
-					m = m.elements;
-					for (i = m.length - 1; i > 0; i--) {
-						tmp = m[i];
-						tmp.className = (tmp.className === 'main-on') ? 'main' : '';
-					}
+					msPerMeasure = m.msPerMeasure;
+
+					offset = lineOffset - line.offsetWidth;
+					$(songLineDisplay).stop().animate({ 'margin-left': Math.ceil( (document.getElementsByTagName('body')[0].offsetWidth / 2) + offset) + 'px' }, msPerMeasure);
+					lineOffset = offset;
 				}
 				else {
-					started = true;
-					tmp = m.elements[beat - 1];
-					tmp.className = (tmp.className === 'main') ? 'main-on' : 'on';
+					self.stop();
 				}
+			}
+			else {
+				currentLine = n + 1;
 			}
 		}
 		else {
-			tmp = m.elements[beat - 1];
-			tmp.className = (tmp.className === 'main') ? 'main-on' : 'on';
+			e = m.elements[beat - 1];
+			e.className = (e.className === 'main') ? 'main-on' : 'on';
 		}
 	}
 
 	function play() {
 		var c = config,
 			core = Playalong.Core,
+			countIn = c.countIn,
 			m,
 			s;
 
@@ -806,15 +751,77 @@ Playalong.Player = function() {
 		// Get metronome
 		metronome = core.getMetronome();
 
-		// Set up song line display
-		songLineDisplay = document.getElementById(c.songLineId);
-		incomingLineDisplay = document.getElementById(c.incomingLineId);
+		// Reset song cursor
+		currentLine = 1 - countIn;
+
+		// Reset song line position
+		lineOffset = 0;
+		$(songLineDisplay).animate({ 'margin-left': '0px' }, (countIn === 0) ? 0 : 250);
 
 		// Start
+		metronomeFirst = true;
 		doBeat(1);
+		started = true;
 
 		return false;
 	}
+
+	function recenter() {
+		var body = document.getElementsByTagName('body')[0],
+			firstLine = document.getElementById('line-1'),
+			//padding = (body.offsetWidth / 2) - lineOffset;
+			padding = (body.offsetWidth / 2);
+
+		firstLine.style.paddingLeft = Math.ceil(padding)  + 'px';
+	}
+
+	this.load = function(s) {
+		// Build song lines HTML
+		var html = [],
+			line,
+			lineNumber = 1;
+
+		do {
+			line = s.getNextLine();
+
+			switch (line) {
+			case "</verse>":
+			case "</chorus>":
+			case "</bridge>":
+			case "</intro>":
+				html.push("</div>\n");
+				break;
+			case "<verse>":
+				html.push('<div class="verse">');
+				break;
+			case "<chorus>":
+				html.push('<div class="chorus">');
+				break;
+			case "<bridge>":
+				html.push('<div class="bridge">');
+				break;
+			case "<intro>":
+				html.push('<div class="intro">');
+				break;
+			case "<song>":
+				break;
+			case "</song>":
+				line = null;
+				break;
+			default:
+				html.push('<span id="line-' + lineNumber + '">' + line + '</span> ');
+				lineNumber = lineNumber + 1;
+				break;
+			}
+		}
+		while (line);
+
+		songLineDisplay.innerHTML = html.join('');
+
+		recenter();
+
+		loaded = true;
+	};
 
 	this.stop = function() {
 		var i,
@@ -826,7 +833,6 @@ Playalong.Player = function() {
 			started = false;
 
 			$(songLineDisplay).stop();
-			$(incomingLineDisplay).stop();
 
 			Playalong.log("Stop!");
 
@@ -852,9 +858,22 @@ Playalong.Player = function() {
 	};
 
 	this.init = function() {
-		var bind = Playalong.Event.bind,
+		var bind,
 			c = config,
+			evt = Playalong.Event,
 			f = document.getElementById(c.formId);
+
+		bind = evt.bind;
+
+		// Set up song line display
+		songLineDisplay = document.getElementById(c.songLineId);
+
+		// Window resize listener (throttled)
+		bind(window, 'resize', function() {
+			if (loaded) {
+				evt.throttle(recenter, this, 25);
+			}
+		});
 
 		//bind(f, "submit", play);
 		bind("#play", "click", play);

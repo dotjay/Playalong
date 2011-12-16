@@ -248,35 +248,46 @@ border-color: #fff;
 color: #fff;
 }
 
-#song-line,
-#song-incoming{
+#player{
 position: absolute;
 top: 50%;
+width: 100%;
+height: 2.5em;
+overflow: hidden;
+margin-top: -1.5em;
 
-font: 42px Copperplate, 'Copperplate Light', 'Copperplate Gothic Light', sans-serif;
-text-align: center;
+font: 42px Futura-CondensedMedium, sans-serif;
+}
+#song-line{
+position: absolute;
+top: 0;
+width: 9999px;
+padding-top: 1em;
 
+border-right: 1px solid #66668c;
 color: #eee;
 text-shadow: #000 -2px 2px 2px;
 }
-#song-line.faded{
+#song-line div{
+display: inline;
+white-space: pre;
+}
+#song-line span{
+margin: 0 0 0 -0.25em;
+padding: 0 1em 0 0;
 opacity: 0.5;
-}
-#song-line{
-width: 100%;
-}
-#song-incoming{
-right: 0;
-opacity: 0.5;
-}
-#song-line b,
-#song-incoming b{
-position: relative;
-top: -0.75em;
-left: 0.5em;
-padding-top: 0.75em;
 
-font: 42px Georgia, Times, "Times New Roman", serif;
+border-right: 1px solid #66668c;
+}
+#song-line span.current{
+opacity: 1;
+}
+#song-line b{
+position: relative;
+top: -1em;
+left: 0.5em;
+
+font: 42px normal Georgia, Times, "Times New Roman", serif;
 }
 
 #controls{

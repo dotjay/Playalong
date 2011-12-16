@@ -3,6 +3,8 @@ Playalong
 
 Version 0 (alpha)
 
+https://github.com/dotjay/Playalong
+
 
 ## About ##
 

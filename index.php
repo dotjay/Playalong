@@ -60,8 +60,7 @@
 
 <div id="song-info"></div>
 
-<div id="song-line"></div>
-<div id="song-incoming"></div>
+<div id="player"><div id="song-line"></div></div>
 
 <div id="controls">
 <form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
